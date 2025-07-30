@@ -1,0 +1,31 @@
+name: Update Anime Data
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # 3 AM UTC
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+          
+      - name: Install dependencies
+        run: pip install httpx beautifulsoup4
+        
+      - name: Run updater
+        run: python scripts/update_anime.py
+        
+      - name: Commit changes
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add .
+          git commit -m "Auto-update anime data" || echo "No changes to commit"
+          git push
